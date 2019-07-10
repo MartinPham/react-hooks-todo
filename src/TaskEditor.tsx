@@ -1,6 +1,15 @@
 import React, {useState, useEffect} from 'react'
+import Task from './Task'
 
-function TaskEditor({task, onSave})
+function TaskEditor(
+    {
+        task, 
+        onSave
+    }: 
+    {
+        task: Task | null, 
+        onSave: (task: Task) => void, 
+    })
 {
     const [name, setName] = useState('')
 
@@ -16,10 +25,10 @@ function TaskEditor({task, onSave})
             <button onClick={() => {
                 setName('')
 
-                const updatedTask = {
-                    id: task === null ? null : task.id,
+                const updatedTask = new Task(
+                    task === null ? 0 : task.id,
                     name
-                }
+				)
                 onSave(updatedTask)
             }}>{task === null ? 'Add' : 'Save'}</button>
         </div>
