@@ -1,8 +1,10 @@
-import React, {useReducer, useState} from 'react'
+import React, {useReducer, useState, useEffect} from 'react'
 import Task from './Task'
 import TaskAction from './TaskAction'
 import TaskList from './TaskList'
 import TaskEditor from './TaskEditor'
+
+
 
 const taskReducer = (tasks: Task[], action: TaskAction) => {
 	if (action.type === 'ADD') {
@@ -28,13 +30,33 @@ const taskReducer = (tasks: Task[], action: TaskAction) => {
 	return tasks
 };
 
+
 const initialTasks: Task[] = [];
+
+const saveTasksJson = localStorage.getItem('tasks') as string;
+if(saveTasksJson !== null)
+{
+	const savedTasks: Task[] = JSON.parse(saveTasksJson);
+	for(let task of savedTasks)
+	{
+		initialTasks.push(new Task(task.id, task.name))
+	}
+}
+
+
 
 
 function App() {
 	const [tasks, dispatchTaskAction] = useReducer(taskReducer, initialTasks);
 	const [editingTask, setEditingTask] = useState<Task | null>(null);
 
+	useEffect(() => {
+			localStorage.setItem('tasks', JSON.stringify(tasks));
+		},
+		[tasks]
+	);
+
+	  
 	return (
 		<div>
 			<TaskList
@@ -52,6 +74,7 @@ function App() {
 			<TaskEditor
 				task={editingTask}
 				onSave={(task: Task) => {
+					setEditingTask(null)
 					if (task.id === 0) {
 						dispatchTaskAction(new TaskAction(
 							'ADD',
