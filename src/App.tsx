@@ -28,6 +28,8 @@ const taskReducer = (tasks: Task[], action: TaskAction) => {
 	} else if (action.type === 'DELETE') {
 		let newTasks = tasks.filter((task: Task) => task.id !== action.payload.id);
 
+		newTasks = newTasks.sort((a: Task, b: Task) => a.position - b.position);
+		
 		for (let i: number = 0; i < newTasks.length; i++) {
 			newTasks[i].position = i + 1;
 		}

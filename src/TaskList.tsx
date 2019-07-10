@@ -18,8 +18,8 @@ function TaskList({ tasks, onRequestEdit, onRequestMoveUp, onRequestMoveDown, on
 				<li key={task.id} className={styles.task} style={{
 					top: task.position * 30
 				}}>
-					<button onClick={() => onRequestMoveUp(task)}>▲</button>
-					<button onClick={() => onRequestMoveDown(task)}>▼</button>
+					<button disabled={task.position <= 1} onClick={() => onRequestMoveUp(task)}>▲</button>
+					<button disabled={task.position >= tasks.length} onClick={() => onRequestMoveDown(task)}>▼</button>
 					&nbsp; &nbsp;
 					{task.name}
 					&nbsp; &nbsp;
