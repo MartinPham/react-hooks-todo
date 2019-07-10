@@ -1,0 +1,8 @@
+.list {
+	position: relative;
+}
+
+.task {
+	position: absolute;
+	transition: all 300ms;
+}

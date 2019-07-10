@@ -9,7 +9,8 @@ import TaskEditor from './TaskEditor'
 const taskReducer = (tasks: Task[], action: TaskAction) => {
 	if (action.type === 'ADD') {
 		const newTasks: Task[] = [...tasks];
-		const newTask: Task = new Task((new Date()).getSeconds(), action.payload.name);
+		const newTask: Task = new Task((new Date()).getTime(), action.payload.name);
+		newTask.position = newTasks.length + 1;
 		newTasks.push(newTask);
 
 		return newTasks
@@ -25,7 +26,55 @@ const taskReducer = (tasks: Task[], action: TaskAction) => {
 
 		return newTasks
 	} else if (action.type === 'DELETE') {
-		return tasks.filter((task: Task) => task.id !== action.payload.id);
+		let newTasks = tasks.filter((task: Task) => task.id !== action.payload.id);
+
+		for (let i: number = 0; i < newTasks.length; i++) {
+			newTasks[i].position = i + 1;
+		}
+
+		console.log(newTasks)
+
+		return newTasks;
+	} else if (action.type === 'MOVE_UP') {
+		const position = action.payload.task.position;
+
+		if(position > 1)
+		{
+			const newTasks: Task[] = [...tasks];
+			for (let i: number = 0; i < newTasks.length; i++) {
+				const task: Task = newTasks[i];
+				if(task.position === position - 1)
+				{
+					newTasks[i].position = position
+				}else if(task.position === position)
+				{
+					newTasks[i].position = position - 1
+				}
+			}
+
+			return newTasks;
+		}
+
+		return tasks;
+	} else if (action.type === 'MOVE_DOWN') {
+		const position = action.payload.task.position;
+
+		if(position < tasks.length)
+		{
+			const newTasks: Task[] = [...tasks];
+			for (let i: number = 0; i < newTasks.length; i++) {
+				const task: Task = newTasks[i];
+				if(task.position === position + 1)
+				{
+					newTasks[i].position = position
+				}else if(task.position === position)
+				{
+					newTasks[i].position = position + 1
+				}
+			}
+
+			return newTasks;
+		}
 	}
 	return tasks
 };
@@ -39,7 +88,9 @@ if(saveTasksJson !== null)
 	const savedTasks: Task[] = JSON.parse(saveTasksJson);
 	for(let task of savedTasks)
 	{
-		initialTasks.push(new Task(task.id, task.name))
+		const savedTask = new Task(task.id, task.name);
+		savedTask.position = task.position;
+		initialTasks.push(savedTask);
 	}
 }
 
@@ -51,6 +102,7 @@ function App() {
 	const [editingTask, setEditingTask] = useState<Task | null>(null);
 
 	useEffect(() => {
+			console.log(tasks);
 			localStorage.setItem('tasks', JSON.stringify(tasks));
 		},
 		[tasks]
@@ -69,6 +121,20 @@ function App() {
 						'DELETE',
 						{
 							id: taskId
+						}))
+				}}
+				onRequestMoveUp={(task: Task) => {
+					dispatchTaskAction(new TaskAction(
+						'MOVE_UP',
+						{
+							task
+						}))
+				}}
+				onRequestMoveDown={(task: Task) => {
+					dispatchTaskAction(new TaskAction(
+						'MOVE_DOWN',
+						{
+							task
 						}))
 				}}/>
 			<TaskEditor
